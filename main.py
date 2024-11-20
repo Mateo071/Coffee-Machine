@@ -2,17 +2,28 @@ import data
 
 is_on = True
 
-def make_espresso():
-  print("making espresso...")
+def make_drink(ingredients, user_input):
+  print(f"making {user_input}...")
+  resources = data.RESOURCES
 
-def make_latte():
-  print("making latte...")
+  if "milk" not in ingredients:
+    ingredients["milk"] = 0
 
-def make_cappuccino():
-  print("making cappuccino...")
+  resources["milk"] -= ingredients["milk"]
+  resources["water"] -= ingredients["water"]
+  resources["coffee"] -= ingredients["coffee"]
+
+  print(f"Here is your {user_input}. Enjoy! 😁")
 
 def print_report():
   print("printing report...")
+  resources = data.RESOURCES
+  water_level = resources["water"]
+  milk_level = resources["milk"]
+  coffee_level = resources["coffee"]
+  money_collected = resources["capital"]
+
+  print(f"Water: {water_level}ml.\nMilk: {milk_level}ml.\nCoffee: {coffee_level}g.\nMoney: ${format(money_collected, '.2f')}.")
 
 def check_funds(price, quarters, dimes, nickels, cents):
   print("calculating amount paid...")
@@ -28,7 +39,7 @@ def check_funds(price, quarters, dimes, nickels, cents):
     give_change(amount_paid, price)
     return True
   else:
-    print("Not enough funds. Please try again.")
+    print("Not enough funds. Your coins have been refunded. Please try again.")
     return False
   
 def process_coins(amount_added):
@@ -71,11 +82,11 @@ def check_resources(ingredients):
   water_levels = data.RESOURCES["water"]
 
   coffee_required = ingredients["coffee"]
+  water_required = ingredients["water"]
   if 'milk' in ingredients:
     milk_required = ingredients["milk"]
   else:
     milk_required = 0
-  water_required = ingredients["water"]
 
   if coffee_levels >= coffee_required and water_levels >= water_required and milk_levels >= milk_required:
     return True
@@ -99,24 +110,21 @@ def prompt():
     price = data.MENU[user_input]["cost"]
     ingredients = data.MENU[user_input]["ingredients"]
 
-    print(f"Your {user_input} will be ${format(price, '.2f')}")
-    print("Please insert your coins.")
-    quarters = input("How many quarters?: ")
-    dimes = input("How many dimes?: ")
-    nickels = input("How many nickels?: ")
-    cents = input("How many cents?: ")
 
 
-    can_afford = check_funds(price, quarters, dimes, nickels, cents)
     have_ingredients = check_resources(ingredients)
+    if have_ingredients:
+      print(f"Your {user_input} will be ${format(price, '.2f')}")
+      print("Please insert your coins.")
+      quarters = input("How many quarters?: ")
+      dimes = input("How many dimes?: ")
+      nickels = input("How many nickels?: ")
+      cents = input("How many cents?: ")
+      can_afford = check_funds(price, quarters, dimes, nickels, cents)
 
     if can_afford and have_ingredients:
-      if user_input == "latte":
-        make_latte()
-      elif user_input == "cappuccino":
-        make_cappuccino()
-      elif user_input == "espresso":
-        make_espresso()
+      if user_input == "latte" or user_input == "cappuccino" or user_input == "espresso":
+        make_drink(ingredients, user_input)
   elif user_input == "report":
     print_report()
   elif user_input == "off":
